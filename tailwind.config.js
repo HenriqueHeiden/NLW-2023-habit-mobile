@@ -11,8 +11,7 @@ module.exports = {
       },
       fontFamily: {
         regular: 'Inter_400Regular',
-        semibold: 'Inter_600SemiBold',
-        bold: 'Inter_700Bold',
+        bold: 'Inter_800ExtraBold',
         extrabold: 'Inter_800ExtraBold'
       }
     },

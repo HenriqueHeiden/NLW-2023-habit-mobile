@@ -1,20 +1,44 @@
 import { useState } from "react";
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
 import { BackButton } from "../components/BackButton";
 import { CheckBox } from "../components/CheckBox";
 import { Feather } from '@expo/vector-icons';
 import colors from "tailwindcss/colors";
+import { api } from "../lib/axios";
 
 const availableWeekDays = ['Doming', 'Segunda-feira', 'Terça-feira', 'Quarta-Feira', 'Quinta-feira', 'Sexta-feira', 'Sábado']
 
 export function New() {
     const [weekDays, setWeekDays] = useState<number[]>([]);
+    const [title, setTitle] = useState('');
 
     function handleToggleWeekDay(weekDayIndex: number) {
         if (weekDays.includes(weekDayIndex)) {
             setWeekDays(prevState => prevState.filter(weekDay => weekDay !== weekDayIndex))
         } else {
             setWeekDays(prevState => [...prevState, weekDayIndex])
+        }
+    }
+
+    async function handleCreateNewHabit(){
+        try {
+            if(!title.trim() || weekDays.length === 0){
+                return Alert.alert('Novo Hábito', 'Informe o nome do hábito e escolha a periodicidade')
+            }
+            
+            const email = "henrique.heiden@gmail.com"
+            await api.post('/habits',{
+                title,
+                weekDays,
+                email
+            })
+
+            setTitle('');
+            setWeekDays([]);
+            Alert.alert('Novo hábito', 'Hábito criado com sucesso!')
+        } catch (error) {
+            console.log(error)
+            Alert.alert('Ops', 'Não foi possivel criar o novo hábito')
         }
     }
 
@@ -32,7 +56,12 @@ export function New() {
                 <Text className="mt-6 text-white font-semibold text-base">
                     Qual seu comprometimento?
                 </Text>
-                <TextInput className="h-12 pl-4 rounded-lg mt-3 bg-zinc-900 text-white border-2 border-zinc-800 focus:border-green-600" />
+                <TextInput 
+                    className="h-12 pl-4 rounded-lg mt-3 bg-zinc-900 text-white border-2 border-zinc-800 focus:border-green-600" 
+                    placeholderTextColor={colors.zinc[400]}
+                    onChangeText={setTitle}
+                    value={title}
+                />
                 <Text className="font-semibold mt-4 mb-3 text-white text-base">
                     Qual a recorrência?
                 </Text>
@@ -48,7 +77,9 @@ export function New() {
 
                 <TouchableOpacity
                     className="w-full h-14 flex-row items-center justify-center bg-green-600 rounded-mt mt-6"
-                    activeOpacity={0.7}>
+                    activeOpacity={0.7}
+                    onPress={handleCreateNewHabit}
+                    >
                     <Feather
                         name="check"
                         size={20}
